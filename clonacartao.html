@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1160/1160515.png" type="image/png">
+    <title>Clona Cartão</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(to bottom, #0f172a 0%, #1e293b 50%, #334155 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30vh;
+            background: #061e1a;
+            clip-path: polygon(0% 100%, 0% 80%, 5% 90%, 10% 70%, 15% 85%, 20% 60%, 25% 90%, 30% 75%, 35% 85%, 40% 50%, 45% 80%, 50% 70%, 55% 90%, 60% 60%, 65% 85%, 70% 75%, 75% 95%, 80% 55%, 85% 80%, 90% 65%, 95% 85%, 100% 70%, 100% 100%);
+            z-index: -1;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        label {
+            align-self: flex-start;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            margin: 5px 0 15px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #6bcaa9;
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #55a88d;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Veja se seu cartão vazou</h1>
+        <form id="fakeForm">
+            <label>Nome do Titular</label>
+            <input type="text" placeholder="Digite o seu nome">
+
+            <label>Número do Cartão</label>
+            <input type="tel" id="ccNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+
+            <label>Data de Validade</label>
+            <input type="tel" id="cardExpiry" placeholder="MM/AA" maxlength="5" inputmode="numeric">
+            <label>Código de Segurança (CVV)</label>
+            <input type="tel" id="cvvNumber" placeholder="123" maxlength="3" inputmode="numeric">
+
+            <label>Senha do Cartão</label>
+            <input type="password" id="cardPin" placeholder="****" maxlength="4" inputmode="numeric">
+
+            <button type="button" id="btnVerificar" onclick="zueira()" disabled>Vericar Agora</button>
+
+        </form>
+    </div>
+    <script>
+        const form = document.getElementById('fakeForm');
+        const btn = document.getElementById('btnVerificar');
+        const ccInput = document.getElementById('ccNumber');
+        const pinInput = document.getElementById('cardPin');
+        const cvvInput = document.getElementById('cvvNumber');
+        const expiryInput = document.getElementById('cardExpiry');
+        const inputs = form.querySelectorAll('input');
+
+        ccInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            e.target.value = value;
+        });
+
+        expiryInput.addEventListener('input', (e) => {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length >= 2) {
+                let month = parseInt(v.substring(0, 2));
+                if (month > 12) month = 12;
+                if (month === 0) month = 1;
+                v = month.toString().padStart(2, '0') + "/" + v.substring(2);
+            }
+            e.target.value = v;
+        });
+
+        [pinInput, cvvInput].forEach(input => {
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/\D/g, '');
+            });
+        });
+
+        form.addEventListener('input', () => {
+            const ccOk = ccInput.value.length === 19;
+            const pinOk = pinInput.value.length === 4;
+            const cvvOk = cvvInput.value.length === 3;
+            const expiryOk = expiryInput.value.length === 5;
+            const nomeOk = inputs[0].value.trim().length > 3;
+            if (ccOk && pinOk && cvvOk && expiryOk && nomeOk) {
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            } else {
+                btn.disabled = true;
+                btn.style.opacity = "0.6";
+            }
+        });
+
+        function zueira() {
+            alert("Ohhhhhhh se eu quisesse...");
+        }
+        function zueira() {
+            const btn = document.getElementById('btnVerificar');
+            btn.disabled = true;
+            btn.innerHTML = "Verificando banco de dados...";
+
+            setTimeout(() => {
+                btn.innerHTML = "Conectando ao servidor seguro...";
+            }, 1500);
+
+            setTimeout(() => {
+                alert("Ohhhhhhh se eu quisesse...");
+                btn.disabled = false;
+                btn.innerHTML = "Verificar Agora";
+            }, 4000);
+        }
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
+</body>
+
+</html>
